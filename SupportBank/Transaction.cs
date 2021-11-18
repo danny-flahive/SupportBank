@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,22 +9,14 @@ namespace SupportBank
 {
     struct Transaction
     {
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         public DateTime date { get; }
         public string fromAccount { get; }
         public string toAccount { get; }
         public string description { get; }
         public decimal amount { get; }
 
-        public Transaction(List<string> data)
-        {
-            date = DateTime.Parse(data[0]);
-            fromAccount = data[1];
-            toAccount = data[2];
-            description = data[3];
-            amount = decimal.Parse(data[4]);
-        }
-
-        public Transaction(string[] data)
+        public Transaction(IList<string> data)
         {
             date = DateTime.Parse(data[0]);
             fromAccount = data[1];

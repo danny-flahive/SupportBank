@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,10 @@ namespace SupportBank
 {
     class Account
     {
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         public string Name;
         private List<Transaction> transactions;
         private decimal balance;
-
         public Account(string name)
         {
             this.Name = name;
@@ -32,6 +33,7 @@ namespace SupportBank
             else
             {
                 //Should never be reached, here to protect against later changes to Main
+                Logger.Warn($"Invalid transaction given to {Name} account");
                 Console.WriteLine("Incorrect Account");
                 return;
             }
@@ -60,6 +62,7 @@ namespace SupportBank
 
         public override string ToString()
         {
+            Logger.Info("Account ToString method invoked");
             StringBuilder stringBuilder = new StringBuilder();
             foreach (Transaction transaction in transactions)
             {
