@@ -92,21 +92,22 @@ namespace SupportBank
             foreach (var rowData in allData.Skip(1).Select((transactionData, index) => (transactionData, index)))
             {
                 int rowNumber = rowData.index + 2; //Due to 0 indexing and skipping the first line
-                Transaction transaction = GenerateTransaction(rowData.transactionData, rowNumber);
-                if (transaction.toAccount == null) //Could check for any parameter being null here to show the row is invalid
+                Transaction? nullableTransaction = GenerateTransaction(rowData.transactionData, rowNumber);
+                if (nullableTransaction.HasValue)
                 {
-                    continue;
+                    Transaction transaction = nullableTransaction.Value;
+                    if (!accounts.ContainsKey(transaction.fromAccount))
+                    {
+                        accounts[transaction.fromAccount] = new Account(transaction.fromAccount);
+                    }
+                    if (!accounts.ContainsKey(transaction.toAccount))
+                    {
+                        accounts[transaction.toAccount] = new Account(transaction.toAccount);
+                    }
+                    accounts[transaction.fromAccount].UpdateAccount(transaction);
+                    accounts[transaction.toAccount].UpdateAccount(transaction);
                 }
-                if (!accounts.ContainsKey(transaction.fromAccount))
-                {
-                    accounts[transaction.fromAccount] = new Account(transaction.fromAccount);
-                }
-                if (!accounts.ContainsKey(transaction.toAccount))
-                {
-                    accounts[transaction.toAccount] = new Account(transaction.toAccount);
-                }
-                accounts[transaction.fromAccount].UpdateAccount(transaction);
-                accounts[transaction.toAccount].UpdateAccount(transaction);
+                
             }
             Logger.Info("Accounts successfully created.");
             return accounts;
@@ -127,8 +128,9 @@ namespace SupportBank
             return new string[0];
         }
 
-        private static Transaction GenerateTransaction(string transactionData, int row)
+        private static Transaction? GenerateTransaction(string transactionData, int row)
         {
+            //TODO: Make this throw an error
             string errorMessage;
             try
             {
@@ -150,7 +152,7 @@ namespace SupportBank
             errorMessage += $" Row {row} skipped.";
             Logger.Warn(errorMessage);
             Console.WriteLine(errorMessage);
-            return new Transaction();
+            return null;
         }
     }
 }
