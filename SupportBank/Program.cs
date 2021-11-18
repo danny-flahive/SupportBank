@@ -11,8 +11,7 @@ namespace SupportBank
         {
             bool cont = true;
             string path = @"C:\Users\Danny.Flahive\Corndel\SupportBank\SupportBank\Transactions2014.csv";
-            string[] transactions = GetTransactionData(path);
-            Dictionary<string, Account> accounts = GenerateAccounts(transactions);
+            Dictionary<string, Account> accounts = GenerateAccounts(GetTransactionData(path));
             while (cont)
             {
                 Console.WriteLine("Enter an option: ");
@@ -54,26 +53,25 @@ namespace SupportBank
             {
                 Console.WriteLine($"{pair.Key} has a balance of {pair.Value.GetBalance():C}");
             }
+            Console.WriteLine();
         }
 
-        private static Dictionary<string, Account> GenerateAccounts(string[] data)
+        private static Dictionary<string, Account> GenerateAccounts(string[] allData)
         {
             Dictionary<string, Account> accounts = new Dictionary<string, Account>();
-            foreach (string transaction in data.Skip(1))
+            foreach (string transactionData in allData.Skip(1))
             {
-                List<string> transactionBreakdown = transaction.Split(",").ToList();
-                string fromPerson = transactionBreakdown[1];
-                string toPerson = transactionBreakdown[2];
-                if (!accounts.ContainsKey(fromPerson))
+                Transaction transaction = new Transaction(transactionData.Split(","));
+                if (!accounts.ContainsKey(transaction.fromAccount))
                 {
-                    accounts[fromPerson] = new Account(fromPerson);
+                    accounts[transaction.fromAccount] = new Account(transaction.fromAccount);
                 }
-                if (!accounts.ContainsKey(toPerson))
+                if (!accounts.ContainsKey(transaction.toAccount))
                 {
-                    accounts[toPerson] = new Account(toPerson);
+                    accounts[transaction.toAccount] = new Account(transaction.toAccount);
                 }
-                accounts[fromPerson].UpdateAccount(transactionBreakdown);
-                accounts[toPerson].UpdateAccount(transactionBreakdown);
+                accounts[transaction.fromAccount].UpdateAccount(transaction);
+                accounts[transaction.toAccount].UpdateAccount(transaction);
             }
             return accounts;
         }
@@ -87,7 +85,6 @@ namespace SupportBank
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                Environment.Exit(0);
             }
             return new string[0];
         }

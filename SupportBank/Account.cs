@@ -9,30 +9,30 @@ namespace SupportBank
     class Account
     {
         public string Name;
-        private List<List<string>> transactions;
+        private List<Transaction> transactions;
         private decimal balance;
 
         public Account(string name)
         {
             this.Name = name;
             balance = 0;
-            transactions = new List<List<string>>();
+            transactions = new List<Transaction>();
         }
 
-        public void UpdateAccount(List<string> transaction)
+        public void UpdateAccount(Transaction transaction)
         {
-            if (transaction[1] == Name)
+            if (transaction.fromAccount == Name)
             {
-                balance -= decimal.Parse(transaction[4]);
+                balance -= transaction.amount;
             }
-            else if (transaction[2] == Name)
+            else if (transaction.toAccount == Name)
             {
-                balance += decimal.Parse(transaction[4]);
+                balance += transaction.amount;
             }
             else
             {
                 //Should never be reached, here to protect against later changes to Main
-                Console.WriteLine("Incorrect account");
+                Console.WriteLine("Incorrect Account");
                 return;
             }
             transactions.Add(transaction);
@@ -51,6 +51,8 @@ namespace SupportBank
             }
             else
             {
+                //Assuming name is a unique identifier in this context, this is fine to use
+                //Would need to change in the case that names were no longer unique
                 Account account = (Account)obj;
                 return Name.Equals(account.Name);
             }
@@ -59,11 +61,11 @@ namespace SupportBank
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder();
-            foreach (List<string> transaction in transactions)
+            foreach (Transaction transaction in transactions)
             {
-                stringBuilder.Append($"On {transaction[0]}, {transaction[1]} borrowed {transaction[4]} from " +
-                    $"{transaction[2]} for {transaction[3]}\n");
+                stringBuilder.Append(transaction.ToString());
             }
+            stringBuilder.Append($"Overall, {Name} {(balance > 0 ? $"is owed {balance:C}" : $"owes {(balance * -1):C}")}\n");
             return stringBuilder.ToString();
         }
 

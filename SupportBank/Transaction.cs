@@ -6,12 +6,35 @@ using System.Threading.Tasks;
 
 namespace SupportBank
 {
-    class Transaction
+    struct Transaction
     {
-        private DateTime date;
-        private string fromAccount;
-        private string toAccount;
-        private string description;
-        private decimal amount;
+        public DateTime date { get; }
+        public string fromAccount { get; }
+        public string toAccount { get; }
+        public string description { get; }
+        public decimal amount { get; }
+
+        public Transaction(List<string> data)
+        {
+            date = DateTime.Parse(data[0]);
+            fromAccount = data[1];
+            toAccount = data[2];
+            description = data[3];
+            amount = decimal.Parse(data[4]);
+        }
+
+        public Transaction(string[] data)
+        {
+            date = DateTime.Parse(data[0]);
+            fromAccount = data[1];
+            toAccount = data[2];
+            description = data[3];
+            amount = decimal.Parse(data[4]);
+        }
+
+        public override string ToString()
+        {
+            return $"On {date.ToShortDateString()}, {fromAccount} borrowed {amount:C} from {toAccount} for {description}\n";
+        }
     }
 }
